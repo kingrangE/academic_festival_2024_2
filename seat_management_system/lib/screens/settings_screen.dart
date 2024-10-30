@@ -1,5 +1,8 @@
 // lib/screens/settings_screen.dart
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/user_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -11,6 +14,7 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
+  late UserProvider _userProvider;
   double _currentSliderValue = 60;
   bool _isEditing = false;
   bool _showSuccess = false;
@@ -20,6 +24,7 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
   @override
   void initState() {
     super.initState();
+    _userProvider = context.read<UserProvider>();
     _controller = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -29,21 +34,15 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
       curve: Curves.easeInOutBack,
     );
     _controller.forward();
-  }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  String _formatDuration(double minutes) {
-    int hours = (minutes ~/ 60);
-    int mins = (minutes % 60).round();
-    return '${hours > 0 ? '$hours시간 ' : ''}${mins > 0 ? '$mins분' : ''}';
+    // 초기값 설정
+    if (_userProvider.user?.customAwayDuration != null) {
+      _currentSliderValue = _userProvider.user!.customAwayDuration!.inMinutes.toDouble();
+    }
   }
 
   void _saveSettings() {
+    _userProvider.setCustomAwayDuration(Duration(minutes: _currentSliderValue.toInt()));
     setState(() {
       _isEditing = false;
       _showSuccess = true;
@@ -56,6 +55,23 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
         });
       }
     });
+  }
+  void _handleQuickTimeSelection(double minutes) {
+    setState(() => _currentSliderValue = minutes);
+    _userProvider.setCustomAwayDuration(Duration(minutes: minutes.toInt()));
+  }
+
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  String _formatDuration(double minutes) {
+    int hours = (minutes ~/ 60);
+    int mins = (minutes % 60).round();
+    return '${hours > 0 ? '$hours시간 ' : ''}${mins > 0 ? '$mins분' : ''}';
   }
 
   @override
@@ -306,7 +322,7 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
   Widget _buildQuickTimeButton(String label, double minutes) {
     final isSelected = _currentSliderValue == minutes;
     return ElevatedButton(
-      onPressed: () => setState(() => _currentSliderValue = minutes),
+      onPressed: () => _handleQuickTimeSelection(minutes),
       style: ElevatedButton.styleFrom(
         backgroundColor: isSelected ? const Color(0xFFC31632) : Colors.white,
         foregroundColor: isSelected ? Colors.white : const Color(0xFFC31632),

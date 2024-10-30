@@ -10,7 +10,8 @@ class SeatSelectionScreen extends StatefulWidget {
   _SeatSelectionScreenState createState() => _SeatSelectionScreenState();
 }
 
-class _SeatSelectionScreenState extends State<SeatSelectionScreen> with TickerProviderStateMixin {
+class _SeatSelectionScreenState extends State<SeatSelectionScreen>
+    with TickerProviderStateMixin {
   String? selectedFloor;
   String? selectedType;
   String? selectedSeat;
@@ -75,6 +76,7 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> with TickerPr
     // 초기 애니메이션 실행
     _slideController.forward();
   }
+
   @override
   void dispose() {
     _slideController.dispose();
@@ -191,7 +193,6 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> with TickerPr
                   return const LinearGradient(
                     colors: [Color(0xFFC31632), Color(0xFF990000)],
                   ).createShader(bounds);
-
                 },
                 child: const Text(
                   '좌석 선택',
@@ -269,16 +270,19 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> with TickerPr
                 ),
                 filled: true,
                 fillColor: Colors.white,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
               value: value,
               items: items.map((item) {
                 return DropdownMenuItem<String>(
                   value: item,
                   child: Text(
-                    item == 'shared' ? '공용 좌석' :
-                    item == 'individual' ? '개인 좌석' :
-                    '$item층',
+                    item == 'shared'
+                        ? '공용 좌석'
+                        : item == 'individual'
+                            ? '개인 좌석'
+                            : '$item층',
                   ),
                 );
               }).toList(),
@@ -289,6 +293,7 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> with TickerPr
       },
     );
   }
+
   Widget _buildSelectionCard() {
     return Card(
       elevation: 4,
@@ -335,36 +340,40 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> with TickerPr
       duration: const Duration(milliseconds: 500),
       builder: (context, value, child) {
         return Transform.scale(
-          scale: value,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              foregroundColor: Colors.white,
-              backgroundColor: const Color(0xFFC31632),
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+            scale: value,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: const Color(0xFFC31632),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 4,
               ),
-              elevation: 4,
-            ),
-            onPressed: () {
-              final seatNumber = '${DateTime.now().millisecond % 100 + 1}';
-                  setState(() {
-                selectedSeat = seatNumber;
-                  reservationMessage = '$selectedFloor층 ${selectedType!.toUpperCase()} 좌석 $seatNumber번 예약 완료';
+              onPressed: () {
+                final seatNumber = '${DateTime.now().millisecond % 100 + 1}';
+                setState(() {
+                  _animateReservation();
+                  selectedSeat = seatNumber;
+                  reservationMessage =
+                      '$selectedFloor층 ${selectedType!.toUpperCase()} 좌석 $seatNumber번 예약 완료';
                   context.read<UserProvider>().updateReservation(
-                    floor: selectedFloor!,
-                    roomType: selectedType!,
-                    seatNumber: seatNumber,
-                  );
-            });},
-        child:  const Text(
-            '좌석 선택하기',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ));
+                        floor: selectedFloor!,
+                        roomType: selectedType!,
+                        seatNumber: seatNumber,
+                      );
+                });
+              },
+              child: const Text(
+                '좌석 선택하기',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ));
       },
     );
   }

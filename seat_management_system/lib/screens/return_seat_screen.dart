@@ -44,7 +44,6 @@ class _ReturnSeatScreenState extends State<ReturnSeatScreen>
     await Future.delayed(const Duration(seconds: 2));
 
     // 좌석 반납 처리
-    _userProvider.clearReservation();
 
     setState(() {
       isReturning = false;
@@ -58,6 +57,7 @@ class _ReturnSeatScreenState extends State<ReturnSeatScreen>
         } else {
           timer.cancel();
           if (mounted) {
+            _userProvider.clearReservation();
             Navigator.of(context).popUntil((route) => route.isFirst);
           }
         }
@@ -71,7 +71,7 @@ class _ReturnSeatScreenState extends State<ReturnSeatScreen>
     final user = context.watch<UserProvider>().user;
 
     // 예약된 좌석이 없으면 홈으로 리다이렉트
-    if (user == null || !user.hasReservation) {
+    if ((user == null || !user.hasReservation)) {
       Future.microtask(() => Navigator.of(context).popUntil((route) => route.isFirst));
       return Container();
     }
