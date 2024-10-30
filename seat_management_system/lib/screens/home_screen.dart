@@ -154,10 +154,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             size.width - 64, buttonHeight),
                         _buildButton(context, '좌석 반납', '/returnSeat',
                             size.width - 64, buttonHeight),
-                        const GPSCheckButton(),
                         _buildButton(
                             context, '설정', '/settings', size.width - 64,
                             buttonHeight),
+                        const GPSCheckButton(),
                       ],
                     ),
                   ),

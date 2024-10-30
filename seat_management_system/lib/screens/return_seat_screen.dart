@@ -1,6 +1,10 @@
 // lib/screens/return_seat_screen.dart
 import 'package:flutter/material.dart';
-import 'dart:async'; // 타이머를 사용하기 위해 필요
+import 'dart:async';
+
+import 'package:provider/provider.dart';
+
+import '../providers/user_provider.dart'; // 타이머를 사용하기 위해 필요
 
 class ReturnSeatScreen extends StatefulWidget {
   const ReturnSeatScreen({super.key});
@@ -8,18 +12,19 @@ class ReturnSeatScreen extends StatefulWidget {
   @override
   _ReturnSeatScreenState createState() => _ReturnSeatScreenState();
 }
-
 class _ReturnSeatScreenState extends State<ReturnSeatScreen>
     with SingleTickerProviderStateMixin {
   bool isReturning = false;
   bool isCompleted = false;
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
-  int remainingSeconds = 3; // 카운트다운을 위한 상태 변수
+  int remainingSeconds = 3;
+  late UserProvider _userProvider;
 
   @override
   void initState() {
     super.initState();
+    _userProvider = context.read<UserProvider>();
     _controller = AnimationController(
       duration: const Duration(milliseconds: 500),
       vsync: this,
@@ -31,12 +36,6 @@ class _ReturnSeatScreenState extends State<ReturnSeatScreen>
     _controller.forward();
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
   Future<void> _handleReturn() async {
     setState(() {
       isReturning = true;
@@ -44,12 +43,14 @@ class _ReturnSeatScreenState extends State<ReturnSeatScreen>
 
     await Future.delayed(const Duration(seconds: 2));
 
+    // 좌석 반납 처리
+    _userProvider.clearReservation();
+
     setState(() {
       isReturning = false;
       isCompleted = true;
     });
 
-    // 카운트다운 타이머 시작
     Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
         if (remainingSeconds > 1) {
@@ -57,7 +58,6 @@ class _ReturnSeatScreenState extends State<ReturnSeatScreen>
         } else {
           timer.cancel();
           if (mounted) {
-            // 홈화면으로 돌아가면서 스택을 초기화
             Navigator.of(context).popUntil((route) => route.isFirst);
           }
         }
@@ -68,6 +68,14 @@ class _ReturnSeatScreenState extends State<ReturnSeatScreen>
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final user = context.watch<UserProvider>().user;
+
+    // 예약된 좌석이 없으면 홈으로 리다이렉트
+    if (user == null || !user.hasReservation) {
+      Future.microtask(() => Navigator.of(context).popUntil((route) => route.isFirst));
+      return Container();
+    }
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -101,22 +109,16 @@ class _ReturnSeatScreenState extends State<ReturnSeatScreen>
             child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 20),
                   Card(
-                    elevation: 8,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
+                    // ... 기존 Card 설정 ...
                     child: Container(
                       width: size.width - 40,
                       padding: const EdgeInsets.all(20.0),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Text(
-                            '현재 예약 정보',
+                          const Text('현재 예약 정보',
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
@@ -126,34 +128,40 @@ class _ReturnSeatScreenState extends State<ReturnSeatScreen>
                           const SizedBox(height: 20),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: const [
-                              Text('층:', style: TextStyle(fontSize: 16)),
-                              Text('3층',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold)),
+                            children: [
+                              const Text('층:', style: TextStyle(fontSize: 16)),
+                              Text('${user.floor}층',
+                                style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold
+                                ),
+                              ),
                             ],
                           ),
                           const SizedBox(height: 10),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: const [
-                              Text('열람실:', style: TextStyle(fontSize: 16)),
-                              Text('제1열람실',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold)),
+                            children: [
+                              const Text('열람실:', style: TextStyle(fontSize: 16)),
+                              Text(user.roomType ?? '',
+                                style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold
+                                ),
+                              ),
                             ],
                           ),
                           const SizedBox(height: 10),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: const [
-                              Text('좌석 번호:', style: TextStyle(fontSize: 16)),
-                              Text('12',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold)),
+                            children: [
+                              const Text('좌석 번호:', style: TextStyle(fontSize: 16)),
+                              Text(user.seatNumber ?? '',
+                                style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold
+                                ),
+                              ),
                             ],
                           ),
                           const SizedBox(height: 30),
