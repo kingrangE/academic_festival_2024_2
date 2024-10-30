@@ -2,7 +2,9 @@
 
 import 'package:flutter/material.dart';
 import '../widgets/reservation_card.dart';
+import '../screens/return_seat_screen.dart';
 import '../widgets/animated_percent_indicator.dart';
+import '../widgets/animated_away_time_indicator.dart';
 import '../widgets/custom_button.dart';
 import 'package:seat_management_system/widgets/gps_check_button.dart';
 
@@ -11,9 +13,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery
-        .of(context)
-        .size;
+    final size = MediaQuery.of(context).size;
     const buttonHeight = 56.0;
     const Duration currentAwayTime = Duration(minutes: 45);
     const maxAwayTime = Duration(hours: 2);
@@ -56,8 +56,7 @@ class HomeScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 24.0),
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 24.0, horizontal: 16.0),
+                  padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(16.0),
@@ -68,7 +67,7 @@ class HomeScreen extends StatelessWidget {
                     children: [
                       const Expanded(
                         child: AnimatedPercentIndicator(
-                          label: 'Personal\nSeats',
+                          label: '개인좌석',
                           percent: 0.75,
                           color: Colors.white,
                           duration: Duration(seconds: 2),
@@ -81,7 +80,7 @@ class HomeScreen extends StatelessWidget {
                       ),
                       const Expanded(
                         child: AnimatedPercentIndicator(
-                          label: 'Shared\nSeats',
+                          label: '공유좌석',
                           percent: 0.85,
                           color: Colors.white,
                           duration: Duration(seconds: 2),
@@ -93,11 +92,12 @@ class HomeScreen extends StatelessWidget {
                         color: Colors.white.withOpacity(0.2),
                       ),
                       Expanded(
-                        child: AnimatedPercentIndicator(
-                          label: 'Away Time\n(Max 2h)',
-                          percent: awayTimePercent,
+                        child: AnimatedAwayTimeIndicator(
+                          label: '부재시간',
+                          awayTime: currentAwayTime,
+                          maxTime: maxAwayTime,
                           color: Colors.white,
-                          duration: Duration(seconds: 2),
+                          duration: const Duration(seconds: 2),
                         ),
                       ),
                     ],
@@ -115,13 +115,13 @@ class HomeScreen extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _buildButton(context, 'Select Seat', '/seatSelection',
+                        _buildButton(context, '좌석 선택', '/seatSelection',
                             size.width - 64, buttonHeight),
-                        _buildButton(context, 'Return Seat', '/returnSeat',
+                        _buildButton(context, '좌석 반납', '/returnSeat',
                             size.width - 64, buttonHeight),
                         const GPSCheckButton(),
                         _buildButton(
-                            context, 'Settings', '/settings', size.width - 64,
+                            context, '설정', '/settings', size.width - 64,
                             buttonHeight),
                       ],
                     ),
