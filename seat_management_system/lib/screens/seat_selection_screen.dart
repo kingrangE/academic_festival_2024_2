@@ -356,16 +356,15 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> with TickerPr
                     roomType: selectedType!,
                     seatNumber: seatNumber,
                   );
-            },
-            child: const Text(
-              '좌석 선택하기',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+            });},
+        child:  const Text(
+            '좌석 선택하기',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
             ),
           ),
-        );
+        ));
       },
     );
   }
