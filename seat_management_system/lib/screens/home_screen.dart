@@ -9,7 +9,9 @@ import 'package:provider/provider.dart';
 import 'package:seat_management_system/widgets/animated_away_time_indicator.dart';
 import '../providers/user_provider.dart';
 import '../widgets/reservation_card.dart';
+import '../screens/return_seat_screen.dart';
 import '../widgets/animated_percent_indicator.dart';
+import '../widgets/animated_away_time_indicator.dart';
 import '../widgets/custom_button.dart';
 import 'package:seat_management_system/widgets/gps_check_button.dart';
 
@@ -88,8 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     )),
                 const SizedBox(height: 24.0),
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 24.0, horizontal: 16.0),
+                  padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(16.0),
@@ -100,7 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       const Expanded(
                         child: AnimatedPercentIndicator(
-                          label: 'Personal\nSeats',
+                          label: '개인좌석',
                           percent: 0.75,
                           color: Colors.white,
                           duration: Duration(seconds: 2),
@@ -113,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const Expanded(
                         child: AnimatedPercentIndicator(
-                          label: 'Shared\nSeats',
+                          label: '공유좌석',
                           percent: 0.85,
                           color: Colors.white,
                           duration: Duration(seconds: 2),
@@ -126,13 +127,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       Expanded(
                         child: AnimatedAwayTimeIndicator(
-                          label: 'Away Time\n(Max 2h)',
+                          label: '부재시간',
                           color: Colors.white,
                           duration: const Duration(seconds: 2),
                           awayTime:Duration(minutes: user?.awayMinutes ?? 0 ) ,
                           maxTime: user?.customAwayDuration ?? const Duration(minutes: 30),
-                          // awayTime:Duration(minutes: 30 ) ,
-                          // maxTime: Duration(minutes: 120),
+                         
                         ),
                       ),
                     ],
@@ -150,13 +150,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _buildButton(context, 'Select Seat', '/seatSelection',
+                        _buildButton(context, '좌석 선택', '/seatSelection',
                             size.width - 64, buttonHeight),
-                        _buildButton(context, 'Return Seat', '/returnSeat',
+                        _buildButton(context, '좌석 반납', '/returnSeat',
                             size.width - 64, buttonHeight),
                         const GPSCheckButton(),
-                        _buildButton(context, 'Settings', '/settings',
-                            size.width - 64, buttonHeight),
+                        _buildButton(
+                            context, '설정', '/settings', size.width - 64,
+                            buttonHeight),
                       ],
                     ),
                   ),
