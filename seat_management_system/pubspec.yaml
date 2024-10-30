@@ -37,8 +37,8 @@ dependencies:
   cupertino_icons: ^1.0.8
 
   # 추가
-  geolocator: ^9.0.0
   percent_indicator: ^4.2.2
+  geolocator: ^13.0.1
 
 dev_dependencies:
   flutter_test:
