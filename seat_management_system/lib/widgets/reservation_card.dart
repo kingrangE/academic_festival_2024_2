@@ -19,6 +19,7 @@ class ReservationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(seatNumber);
     if (!hasActiveReservation) return const SizedBox.shrink();
 
     return Container(

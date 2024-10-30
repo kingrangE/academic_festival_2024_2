@@ -10,13 +10,13 @@ class AnimatedAwayTimeIndicator extends StatefulWidget {
   final Duration duration;
 
   const AnimatedAwayTimeIndicator({
-    Key? key,
+    super.key,
     required this.label,
     required this.awayTime,
     required this.maxTime,
     required this.color,
     required this.duration,
-  }) : super(key: key);
+  });
 
   @override
   State<AnimatedAwayTimeIndicator> createState() => _AnimatedAwayTimeIndicatorState();
@@ -47,6 +47,21 @@ class _AnimatedAwayTimeIndicatorState extends State<AnimatedAwayTimeIndicator>
     _controller.forward();
   }
 
+  @override
+  void didUpdateWidget(AnimatedAwayTimeIndicator oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.awayTime != widget.awayTime) {
+      final percent = widget.awayTime.inMinutes / widget.maxTime.inMinutes;
+      _animation = Tween<double>(
+        begin: _animation.value,
+        end: percent,
+      ).animate(CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOut,
+      ));
+      _controller.forward(from: 0);
+    }
+  }
   @override
   void dispose() {
     _controller.dispose();
