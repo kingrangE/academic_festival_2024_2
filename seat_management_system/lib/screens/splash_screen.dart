@@ -57,7 +57,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1C1C1C), // Darker background color
+      backgroundColor: const Color(0xFFC31632), // Sejong University red color
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -69,9 +69,10 @@ class _SplashScreenState extends State<SplashScreen>
                 'lib/assets/images/sejong_logo.png',
                 width: 180,
                 height: 180,
+                color: Colors.white, // Make the logo white
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             FadeTransition(
               opacity: _fadeInText,
               child: const Text(
@@ -90,11 +91,11 @@ class _SplashScreenState extends State<SplashScreen>
                 'Sejong University',
                 style: TextStyle(
                   fontSize: 18,
-                  color: Colors.grey,
+                  color: Colors.white70,
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             const CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
             ),
