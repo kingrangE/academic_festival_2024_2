@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:seat_management_system/providers/user_provider.dart';
 import 'package:seat_management_system/widgets/gps_permission_handler.dart';
 import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
@@ -8,9 +10,16 @@ import 'screens/settings_screen.dart';
 import 'screens/gps_check_screen.dart';
 
 void main() {
-  runApp(const GPSPermissionHandler(
-    child: MyApp(),
-  ));
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+      ],
+      child: const GPSPermissionHandler(
+        child: MyApp(),
+      ),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -28,7 +37,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const SplashScreen(),
         '/login': (context) => const LoginScreen(),
-        '/home': (context) => const HomeScreen(),
+        '/home': (context) => HomeScreen(),
         '/seatSelection': (context) => const SeatSelectionScreen(),
         '/settings': (context) => const SettingsScreen(),
         '/gpsCheck': (context) => const GpsCheckScreen(),

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/user_provider.dart';
 
 class SeatSelectionScreen extends StatefulWidget {
   const SeatSelectionScreen({super.key});
@@ -140,8 +143,8 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
             if (selectedFloor != null && selectedType != null)
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  foregroundColor: Color(0xFF990000), backgroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(vertical: 16.0),
+                  foregroundColor: const Color(0xFF990000), backgroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -152,6 +155,11 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
                   setState(() {
                     selectedSeat = seatNumber;
                     reservationMessage = '$selectedFloor층 ${selectedType!.toUpperCase()} 좌석 $seatNumber번 예약 완료';
+                    context.read<UserProvider>().updateReservation(
+                      floor: selectedFloor!,
+                      roomType: selectedType!,
+                      seatNumber: seatNumber,
+                    );
                   });
                 },
                 child: const Text(

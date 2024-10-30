@@ -1,23 +1,48 @@
 // lib/screens/home_screen.dart
 
+import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:provider/provider.dart';
+import 'package:seat_management_system/widgets/animated_away_time_indicator.dart';
+import '../providers/user_provider.dart';
 import '../widgets/reservation_card.dart';
 import '../widgets/animated_percent_indicator.dart';
 import '../widgets/custom_button.dart';
 import 'package:seat_management_system/widgets/gps_check_button.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<UserProvider>().startLocationTracking();
+    });
+  }
+
+  bool hasReservation = false;
+
+  @override
   Widget build(BuildContext context) {
-    final size = MediaQuery
-        .of(context)
-        .size;
+    final size = MediaQuery.of(context).size;
     const buttonHeight = 56.0;
     const Duration currentAwayTime = Duration(minutes: 45);
-    const maxAwayTime = Duration(hours: 2);
-    final awayTimePercent = currentAwayTime.inMinutes / maxAwayTime.inMinutes;
+    final user = context.watch<UserProvider>().user;
+
+    if (user?.hasReservation ?? false) {
+      hasReservation = true;
+    } else {
+      hasReservation = false;
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -46,14 +71,21 @@ class HomeScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Column(
               children: [
-                const SizedBox(height: 16.0),
-                const ReservationCard(
-                  hasActiveReservation: true,
-                  floor: '3',
-                  roomName: '제1열람실',
-                  seatNumber: '12',
-                  awayTime: currentAwayTime,
-                ),
+                Visibility(
+                    visible: hasReservation,
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 16.0),
+                        ReservationCard(
+                          hasActiveReservation: true,
+                          floor: user?.floor ?? '',
+                          // null 일 경우 빈 문자열 반환
+                          roomName: user?.roomType ?? '',
+                          seatNumber: user?.seatNumber ?? '',
+                          awayTime: Duration(minutes: user?.awayMinutes ?? 0),
+                        ),
+                      ],
+                    )),
                 const SizedBox(height: 24.0),
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -93,11 +125,14 @@ class HomeScreen extends StatelessWidget {
                         color: Colors.white.withOpacity(0.2),
                       ),
                       Expanded(
-                        child: AnimatedPercentIndicator(
+                        child: AnimatedAwayTimeIndicator(
                           label: 'Away Time\n(Max 2h)',
-                          percent: awayTimePercent,
                           color: Colors.white,
-                          duration: Duration(seconds: 2),
+                          duration: const Duration(seconds: 2),
+                          awayTime:Duration(minutes: user?.awayMinutes ?? 0 ) ,
+                          maxTime: user?.customAwayDuration ?? const Duration(minutes: 30),
+                          // awayTime:Duration(minutes: 30 ) ,
+                          // maxTime: Duration(minutes: 120),
                         ),
                       ),
                     ],
@@ -120,9 +155,8 @@ class HomeScreen extends StatelessWidget {
                         _buildButton(context, 'Return Seat', '/returnSeat',
                             size.width - 64, buttonHeight),
                         const GPSCheckButton(),
-                        _buildButton(
-                            context, 'Settings', '/settings', size.width - 64,
-                            buttonHeight),
+                        _buildButton(context, 'Settings', '/settings',
+                            size.width - 64, buttonHeight),
                       ],
                     ),
                   ),
