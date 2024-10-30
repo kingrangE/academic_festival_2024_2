@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:seat_management_system/widgets/gps_permission_handler.dart';
 import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
@@ -7,7 +8,9 @@ import 'screens/settings_screen.dart';
 import 'screens/gps_check_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const GPSPermissionHandler(
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {

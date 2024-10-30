@@ -1,15 +1,19 @@
 // lib/screens/home_screen.dart
+
 import 'package:flutter/material.dart';
 import '../widgets/reservation_card.dart';
 import '../widgets/animated_percent_indicator.dart';
 import '../widgets/custom_button.dart';
+import 'package:seat_management_system/widgets/gps_check_button.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+    final size = MediaQuery
+        .of(context)
+        .size;
     const buttonHeight = 56.0;
     const Duration currentAwayTime = Duration(minutes: 45);
     const maxAwayTime = Duration(hours: 2);
@@ -43,7 +47,7 @@ class HomeScreen extends StatelessWidget {
             child: Column(
               children: [
                 const SizedBox(height: 16.0),
-                ReservationCard(
+                const ReservationCard(
                   hasActiveReservation: true,
                   floor: '3',
                   roomName: '제1열람실',
@@ -52,7 +56,8 @@ class HomeScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 24.0),
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 24.0, horizontal: 16.0),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(16.0),
@@ -110,10 +115,14 @@ class HomeScreen extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _buildButton(context, 'Select Seat', '/seatSelection', size.width - 64, buttonHeight),
-                        _buildButton(context, 'Return Seat', '/returnSeat', size.width - 64, buttonHeight),
-                        _buildButton(context, 'GPS Check', '/gpsCheck', size.width - 64, buttonHeight),
-                        _buildButton(context, 'Settings', '/settings', size.width - 64, buttonHeight),
+                        _buildButton(context, 'Select Seat', '/seatSelection',
+                            size.width - 64, buttonHeight),
+                        _buildButton(context, 'Return Seat', '/returnSeat',
+                            size.width - 64, buttonHeight),
+                        const GPSCheckButton(),
+                        _buildButton(
+                            context, 'Settings', '/settings', size.width - 64,
+                            buttonHeight),
                       ],
                     ),
                   ),
@@ -127,7 +136,8 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildButton(BuildContext context, String label, String route, double width, double height) {
+  Widget _buildButton(BuildContext context, String label, String route,
+      double width, double height) {
     return Container(
       width: width,
       height: height,

@@ -17,7 +17,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final studentId = _studentIdController.text;
     final password = _passwordController.text;
 
-    if (studentId == '21011702' && password == '10141116') {
+    if ((studentId == '21011702' && password == '10141116')||(studentId == '20011832' && password == '10141116')) {
       // Navigate to the main screen on successful login
       Navigator.pushReplacement(
         context,

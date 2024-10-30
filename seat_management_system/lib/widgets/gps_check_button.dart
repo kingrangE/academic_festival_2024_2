@@ -13,7 +13,7 @@ class GPSCheckButton extends StatefulWidget {
 class _GPSCheckButtonState extends State<GPSCheckButton> {
   bool _isLoading = false;
   String? _error;
-
+  final buttonHeight = 56.0;
   Future<void> _checkGPS() async {
     setState(() {
       _isLoading = true;
@@ -55,24 +55,24 @@ class _GPSCheckButtonState extends State<GPSCheckButton> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
+          width: size.width - 64,
+          height: buttonHeight,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF990000), Color(0xFFCC0000)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(12),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12.0),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 8,
-                offset: Offset(0, 4),
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
               ),
             ],
           ),
@@ -86,32 +86,16 @@ class _GPSCheckButtonState extends State<GPSCheckButton> {
                   horizontal: 24,
                   vertical: 16,
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _isLoading
-                        ? const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
-                      ),
-                    )
-                        : const Icon(
-                      Icons.location_on,
-                      color: Colors.white,
+                child:
+                Center(
+                  child: Text(
+                    _isLoading ? '위치 확인 중...' : 'GPS 수동 확인',
+                    style: const TextStyle(
+                      color: const Color(0xFFC31632),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
-                    const SizedBox(width: 12),
-                    Text(
-                      _isLoading ? '위치 확인 중...' : 'GPS 위치 확인',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
