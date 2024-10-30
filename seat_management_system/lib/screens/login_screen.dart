@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../models/user.dart';
+import '../providers/user_provider.dart';
 import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -19,9 +22,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if ((studentId == '21011702' && password == '10141116')||(studentId == '20011832' && password == '10141116')) {
       // Navigate to the main screen on successful login
+      context.read<UserProvider>().setUser(
+          User(
+            id: 'user123',
+            grade: 3,
+          )
+      );
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(builder: (context) => HomeScreen()),
       );
     } else {
       // Display an error message on authentication failure

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async'; // 타이머를 사용하기 위해 필요
+import 'package:provider/provider.dart';
+import '../providers/user_provider.dart';
 
 class SeatSelectionScreen extends StatefulWidget {
   const SeatSelectionScreen({super.key});
@@ -73,7 +75,6 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> with TickerPr
     // 초기 애니메이션 실행
     _slideController.forward();
   }
-
   @override
   void dispose() {
     _slideController.dispose();
@@ -190,6 +191,7 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> with TickerPr
                   return const LinearGradient(
                     colors: [Color(0xFFC31632), Color(0xFF990000)],
                   ).createShader(bounds);
+
                 },
                 child: const Text(
                   '좌석 선택',
@@ -287,7 +289,6 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> with TickerPr
       },
     );
   }
-
   Widget _buildSelectionCard() {
     return Card(
       elevation: 4,
@@ -347,12 +348,14 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> with TickerPr
             ),
             onPressed: () {
               final seatNumber = '${DateTime.now().millisecond % 100 + 1}';
-              setState(() {
+                  setState(() {
                 selectedSeat = seatNumber;
-                reservationMessage =
-                '$selectedFloor층 ${selectedType == 'shared' ? '공용' : '개인'} 좌석 $seatNumber번 예약 완료';
-                _animateReservation();
-              });
+                  reservationMessage = '$selectedFloor층 ${selectedType!.toUpperCase()} 좌석 $seatNumber번 예약 완료';
+                  context.read<UserProvider>().updateReservation(
+                    floor: selectedFloor!,
+                    roomType: selectedType!,
+                    seatNumber: seatNumber,
+                  );
             },
             child: const Text(
               '좌석 선택하기',
