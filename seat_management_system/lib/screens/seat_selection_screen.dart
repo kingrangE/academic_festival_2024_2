@@ -104,7 +104,7 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen>
         } else {
           timer.cancel();
           if (mounted) {
-            Navigator.of(context).pushReplacementNamed('/home');
+            Navigator.of(context).popUntil((route) => route.isFirst);
           }
         }
       });
