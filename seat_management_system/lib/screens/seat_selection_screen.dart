@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:async'; // 타이머를 사용하기 위해 필요
 import 'package:provider/provider.dart';
+import '../constants/reading_rooms.dart';
+import '../models/reading_room.dart';
 import '../providers/user_provider.dart';
 
 class SeatSelectionScreen extends StatefulWidget {
@@ -10,12 +12,38 @@ class SeatSelectionScreen extends StatefulWidget {
   _SeatSelectionScreenState createState() => _SeatSelectionScreenState();
 }
 
-class _SeatSelectionScreenState extends State<SeatSelectionScreen>
-    with TickerProviderStateMixin {
+class _SeatSelectionScreenState extends State<SeatSelectionScreen> with TickerProviderStateMixin{
   String? selectedFloor;
-  String? selectedType;
+  String? selectedRoomType;
+  String? selectedSeatType;
   String? selectedSeat;
   String? reservationMessage;
+
+  final List<String> floors = ['B1', '1', '3', '4'];
+  final List<String> seatTypes = ['shared', 'individual'];
+
+  List<ReadingRoom> getAvailableRooms() {
+    if (selectedFloor == null) return [];
+    return readingRooms.where((room) => room.floor == selectedFloor).toList();
+  }
+
+  String? generateRandomSeat() {
+    if (selectedRoomType == null) return null;
+
+    final room =
+        readingRooms.firstWhere((room) => room.name == selectedRoomType);
+    final allSeats = <int>[];
+
+    for (var range in room.seatRanges) {
+      for (var i = range.start; i <= range.end; i++) {
+          allSeats.add(i);
+      }
+    }
+
+    if (allSeats.isEmpty) return null;
+    allSeats.shuffle();
+    return allSeats.first.toString();
+  }
 
   late AnimationController _slideController;
   late AnimationController _scaleController;
@@ -24,9 +52,6 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen>
   late Animation<Offset> _slideAnimation;
   late Animation<double> _scaleAnimation;
   late Animation<double> _reservationAnimation;
-
-  final List<String> floors = ['1', '2', '3', '4'];
-  final List<String> seatTypes = ['shared', 'individual'];
 
   int remainingSeconds = 3; // 카운트다운 상태 변수
 
@@ -145,7 +170,7 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen>
               children: [
                 _buildMainCard(),
                 const SizedBox(height: 20),
-                if (selectedFloor != null && selectedType != null)
+                if (selectedFloor != null && selectedRoomType != null && selectedSeatType != null)
                   ScaleTransition(
                     scale: _scaleAnimation,
                     child: _buildSelectionCard(),
@@ -186,24 +211,7 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen>
             ),
           ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ShaderMask(
-                shaderCallback: (Rect bounds) {
-                  return const LinearGradient(
-                    colors: [Color(0xFFC31632), Color(0xFF990000)],
-                  ).createShader(bounds);
-                },
-                child: const Text(
-                  '좌석 선택',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
               _buildAnimatedDropdown(
                 value: selectedFloor,
                 items: floors,
@@ -212,19 +220,34 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen>
                 onChanged: (value) {
                   setState(() {
                     selectedFloor = value;
+                    selectedRoomType = null;
                     _animateSelection();
                   });
                 },
               ),
               const SizedBox(height: 16),
+              if (selectedFloor != null)
+                _buildAnimatedDropdown(
+                  value: selectedRoomType,
+                  items: getAvailableRooms().map((e) => e.name).toList(),
+                  label: '열람실 선택',
+                  hint: '열람실을 선택하세요',
+                  onChanged: (value) {
+                    setState(() {
+                      selectedRoomType = value;
+                      _animateSelection();
+                    });
+                  },
+                ),
+              const SizedBox(height: 16),
               _buildAnimatedDropdown(
-                value: selectedType,
+                value: selectedSeatType,
                 items: seatTypes,
                 label: '좌석 유형',
                 hint: '좌석 유형을 선택하세요',
                 onChanged: (value) {
                   setState(() {
-                    selectedType = value;
+                    selectedSeatType = value;
                     _animateSelection();
                   });
                 },
@@ -324,8 +347,9 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen>
               ),
             ),
             const SizedBox(height: 12),
-            Text('층: $selectedFloor층'),
-            Text('유형: ${selectedType == 'shared' ? '공용 좌석' : '개인 좌석'}'),
+            Text('$selectedFloor층'),
+            Text('$selectedRoomType'),
+            Text('${selectedSeatType == 'shared' ? '공용 좌석' : '개인 좌석'}'),
             const SizedBox(height: 16),
             _buildSelectButton(),
           ],
@@ -353,15 +377,15 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen>
                 elevation: 4,
               ),
               onPressed: () {
-                final seatNumber = '${DateTime.now().millisecond % 100 + 1}';
+                final seatNumber = generateRandomSeat() ?? '0';
                 setState(() {
                   _animateReservation();
                   selectedSeat = seatNumber;
                   reservationMessage =
-                      '$selectedFloor층 ${selectedType!.toUpperCase()} 좌석 $seatNumber번 예약 완료';
+                      '$selectedFloor층 $selectedRoomType ${selectedSeatType!.toUpperCase()} 좌석 $seatNumber번 예약 완료';
                   context.read<UserProvider>().updateReservation(
                         floor: selectedFloor!,
-                        roomType: selectedType!,
+                        roomType: selectedRoomType!,
                         seatNumber: seatNumber,
                       );
                 });
