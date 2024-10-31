@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:provider/provider.dart';
+import '../providers/user_provider.dart';
 
 class GPSCheckButton extends StatefulWidget {
   final Function(Position)? onLocationObtained;
@@ -14,7 +16,24 @@ class _GPSCheckButtonState extends State<GPSCheckButton> {
   bool _isLoading = false;
   String? _error;
   final buttonHeight = 56.0;
+
+  bool isInValidLocation(Position position) {
+    const double targetLat = 37.551646;
+    const double targetLng = 127.074346;
+    const double allowedDistance = 60;
+
+    double distance = Geolocator.distanceBetween(
+        position.latitude,
+        position.longitude,
+        targetLat,
+        targetLng
+    );
+
+    return distance <= allowedDistance;
+  }
+
   Future<void> _checkGPS() async {
+    print("GPS 검사");
     setState(() {
       _isLoading = true;
       _error = null;
@@ -41,6 +60,24 @@ class _GPSCheckButtonState extends State<GPSCheckButton> {
         desiredAccuracy: LocationAccuracy.high,
       );
 
+      // 위치 확인 및 상태 업데이트
+      final userProvider = context.read<UserProvider>();
+      bool isInside = isInValidLocation(position);
+
+      if (isInside) {
+        userProvider.stopAwayTracking();
+        setState(() {
+          _error = '지정된 위치 내에 있습니다.';
+        });
+        print("지정된 위치에 있습니다.");
+      } else {
+        userProvider.startAwayTracking();
+        setState(() {
+          _error = '지정된 위치를 벗어났습니다.';
+        });
+        print("지정된 위치에 없습니다.");
+      }
+
       if (widget.onLocationObtained != null) {
         widget.onLocationObtained!(position);
       }
@@ -54,7 +91,6 @@ class _GPSCheckButtonState extends State<GPSCheckButton> {
       });
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -86,12 +122,34 @@ class _GPSCheckButtonState extends State<GPSCheckButton> {
                   horizontal: 24,
                   vertical: 16,
                 ),
-                child:
-                Center(
-                  child: Text(
-                    _isLoading ? '위치 확인 중...' : 'GPS 수동 확인',
-                    style: const TextStyle(
-                      color: const Color(0xFFC31632),
+                child: Center(
+                  child: _isLoading
+                      ? const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Color(0xFFC31632),
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        '위치 확인 중...',
+                        style: TextStyle(
+                          color: Color(0xFFC31632),
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  )
+                      : const Text(
+                    'GPS 수동 확인',
+                    style: TextStyle(
+                      color: Color(0xFFC31632),
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -106,8 +164,9 @@ class _GPSCheckButtonState extends State<GPSCheckButton> {
           Text(
             _error!,
             style: TextStyle(
-              color: Colors.red[700],
+              color: _error!.contains('내에 있습니다') ? Colors.green : Colors.red[700],
               fontSize: 14,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ],
